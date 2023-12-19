@@ -1,35 +1,54 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useEffect } from 'react';
+import { ContactList } from './components/ContactList';
+import { ContactCard } from './components/ContactCard';
+import './App.css';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const URL = 'http://fsa-jsonplaceholder-69b5c48f1259.herokuapp.com/users';
+  const [userList, setUserList] = useState([]);
+  const [selectedUserId, setSelectedUserId] = useState(null);
+  const [selectedUser, setSelectedUser] = useState(null);
+
+  useEffect(() => {
+    async function getData() {
+      try {
+        const rawUserData = await fetch(URL);
+        const deserializedUserData = await rawUserData.json();
+        return deserializedUserData;
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    getData().then((response) => setUserList(response));
+  }, []);
+
+  useEffect(() => {
+    async function getSingleContact() {
+      try {
+        if (selectedUserId) {
+          const selectedUser = await fetch(`${URL}/${selectedUserId}`);
+          const deserializedSelectedUser = await selectedUser.json();
+          setSelectedUser(deserializedSelectedUser);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    getSingleContact();
+  }, [selectedUserId]);
 
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      {selectedUser ? (
+        <div>
+          <ContactCard userId={selectedUserId} user={selectedUser} />
+          <button onClick={(e) => setSelectedUser(null)}>Return to List</button>
+        </div>
+      ) : (
+        <ContactList setSelectedUserId={setSelectedUserId} users={userList} />
+      )}
     </>
-  )
+  );
 }
 
-export default App
+export default App;
