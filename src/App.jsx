@@ -4,7 +4,7 @@ import { ContactCard } from './components/ContactCard';
 import './App.css';
 
 function App() {
-  const URL = 'http://fsa-jsonplaceholder-69b5c48f1259.herokuapp.com/users';
+  const URL = 'https://fsa-jsonplaceholder-69b5c48f1259.herokuapp.com/users';
   const [userList, setUserList] = useState([]);
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
